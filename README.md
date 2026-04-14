@@ -39,12 +39,13 @@ Writing those by hand for every single line is painful. **This tool does it for 
 ## 🚀 How to use
 
 ### Online (GitHub Pages)
-Just visit: **[motd-ascii.github.io](https://motd-ascii.github.io)**
+Just visit: **[termotd.github.io](https://termotd.github.io)**
 
 ### Offline
 1. Download or clone this repo
 2. Open `index.html` in your browser
 3. Done — no server, no dependencies!
+
 
 ---
 
@@ -88,7 +89,7 @@ sudo run-parts /etc/update-motd.d/
 ## 📂 Project structure
 
 ```
-motd-ascii.github.io/
+termotd.github.io/
 ├── index.html         ← The entire tool (single file, no dependencies)
 ├── README.md
 └── .github/
