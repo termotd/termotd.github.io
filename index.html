@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MOTD Color Generator — by hohky</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d1117;--s1:#161b22;--s2:#21262d;--bd:#30363d;--tx:#e6edf3;--mt:#8b949e;--gn:#3fb950;--ac:#58a6ff;--r:8px;--mono:'JetBrains Mono',monospace;--sans:'Inter',sans-serif;}
+body{font-family:var(--sans);background:var(--bg);color:var(--tx);min-height:100vh;padding:20px 14px;}
+.wrap{max-width:980px;margin:0 auto;}
+header{display:flex;align-items:center;gap:10px;margin-bottom:22px;padding-bottom:14px;border-bottom:1px solid var(--bd);}
+.logo{width:34px;height:34px;background:#0d2818;border:1px solid var(--gn);border-radius:7px;display:grid;place-items:center;font-family:var(--mono);font-size:13px;color:var(--gn);font-weight:700;flex-shrink:0;}
+h1{font-size:17px;font-weight:600;font-family:var(--mono);}h1 em{color:var(--gn);font-style:normal;}
+.badge{font-size:10px;background:#1a3a2a;border:1px solid #2d5a3d;color:var(--gn);padding:2px 7px;border-radius:20px;font-family:var(--mono);font-weight:700;}
+.sub{font-size:11px;color:var(--mt);margin-left:auto;font-family:var(--mono);}
+.sub a{color:var(--gn);text-decoration:none;}
+.sub a:hover{text-decoration:underline;}
+.mode-bar{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap;}
+.mode-tab{font-family:var(--mono);font-size:12px;font-weight:600;padding:9px 18px;border-radius:7px;cursor:pointer;border:1px solid var(--bd);background:var(--s2);color:var(--mt);transition:all .15s;}
+.mode-tab.on{background:#1a3a2a;border-color:var(--gn);color:var(--gn);}
+.mode-tab:hover:not(.on){color:var(--tx);}
+.card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;margin-bottom:14px;}
+.card-head{display:flex;align-items:center;gap:7px;padding:9px 13px;background:var(--s2);border-bottom:1px solid var(--bd);}
+.dots{display:flex;gap:4px;}.dot{width:9px;height:9px;border-radius:50%;}
+.card-title{font-size:10px;font-weight:700;color:var(--mt);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;}
+textarea{width:100%;background:transparent;border:none;color:var(--tx);font-family:var(--mono);font-size:12.5px;line-height:1.75;padding:13px;resize:vertical;outline:none;}
+textarea::placeholder{color:var(--mt);opacity:.45;}
+select{background:var(--s2);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--mono);font-size:12px;padding:6px 26px 6px 8px;outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%238b949e' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 7px center;}
+select:focus{border-color:var(--gn);}
+button{font-family:var(--mono);font-size:12px;font-weight:600;padding:8px 15px;border-radius:6px;cursor:pointer;border:none;transition:all .14s;display:inline-flex;align-items:center;gap:5px;}
+.bp{background:var(--gn);color:#0d1117;}.bp:hover{background:#4fc862;transform:translateY(-1px);}
+.bs{background:var(--s2);color:var(--tx);border:1px solid var(--bd);}.bs:hover{border-color:var(--ac);color:var(--ac);}
+.br{background:transparent;color:var(--mt);border:1px solid var(--bd);}.br:hover{border-color:#f85149;color:#f85149;}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+.chips-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px;}
+.chip{width:20px;height:20px;border-radius:4px;cursor:pointer;border:2px solid transparent;transition:transform .12s,border-color .12s;flex-shrink:0;}
+.chip:hover{transform:scale(1.3);}.chip.on{border-color:#fff;transform:scale(1.2);}
+.ltw{display:none;}
+.lt{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12px;}
+.lt th{text-align:left;padding:7px 11px;font-size:10px;color:var(--mt);text-transform:uppercase;letter-spacing:.06em;background:var(--s2);border-bottom:1px solid var(--bd);font-weight:700;}
+.lt td{padding:5px 11px;border-bottom:1px solid #1c2128;vertical-align:middle;}
+.lt tr:last-child td{border-bottom:none;}.lt tr:hover td{background:#1c2128;}
+.lcs{padding:4px 24px 4px 7px;font-size:11px;}.lcb{width:14px;height:14px;cursor:pointer;accent-color:var(--gn);}
+.legend{display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:5px;padding:11px 13px;}
+.leg-item{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;}
+.leg-tag{background:var(--s2);border:1px solid var(--bd);border-radius:4px;padding:2px 7px;cursor:pointer;transition:all .13s;white-space:nowrap;user-select:none;}
+.leg-tag:hover{border-color:var(--gn);transform:scale(1.05);}
+.leg-dot{width:11px;height:11px;border-radius:2px;flex-shrink:0;}
+.out-card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;}
+.out-head{display:flex;align-items:center;justify-content:space-between;padding:9px 13px;background:var(--s2);border-bottom:1px solid var(--bd);}
+.tabs{display:flex;gap:3px;}
+.tab{font-family:var(--mono);font-size:11px;padding:4px 10px;border-radius:4px;cursor:pointer;color:var(--mt);background:transparent;border:1px solid transparent;transition:all .13s;font-weight:600;}
+.tab.on{background:var(--bg);border-color:var(--bd);color:var(--tx);}
+.tab:hover:not(.on){color:var(--tx);}
+.cbtn{font-family:var(--mono);font-size:11px;padding:4px 10px;border-radius:4px;cursor:pointer;color:var(--mt);background:transparent;border:1px solid var(--bd);font-weight:600;transition:all .13s;}
+.cbtn:hover{border-color:var(--gn);color:var(--gn);}
+#outcode{padding:13px;font-family:var(--mono);font-size:12.5px;line-height:1.75;min-height:90px;white-space:pre;overflow-x:auto;}
+.section{display:none;}.section.on{display:block;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:640px){.grid2{grid-template-columns:1fr;}}
+.opt-body{padding:13px;display:flex;flex-direction:column;gap:11px;}
+.fl{display:flex;flex-direction:column;gap:4px;}
+.fl label{font-size:10px;color:var(--mt);font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em;font-weight:700;}
+.hint{font-size:11px;color:var(--mt);font-family:var(--mono);line-height:1.5;}
+footer{text-align:center;padding:18px 0 6px;border-top:1px solid var(--bd);margin-top:16px;color:var(--mt);font-size:11px;font-family:var(--mono);}
+footer b{color:var(--gn);}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="logo">$_</div>
+  <h1><em>MOTD</em> Color Generator</h1>
+  <span class="badge">v2</span>
+  <span class="sub">by <a href="https://github.com/hohky" target="_blank" rel="noopener">hohky</a> 🍓</span>
+</header>
+<div class="mode-bar">
+  <button class="mode-tab on" id="m0" onclick="setMode(0)">🎨 Color per Line</button>
+  <button class="mode-tab" id="m1" onclick="setMode(1)">✨ Inline Placeholders</button>
+</div>
+
+<!-- MODE 0 -->
+<div class="section on" id="sec0">
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><div class="dots"><div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#ffbd2e"></div><div class="dot" style="background:#28c840"></div></div><span class="card-title">Paste your ASCII text here</span></div>
+      <textarea id="inp0" rows="9" placeholder="Paste your ASCII art or table here..." oninput="buildLines()"></textarea>
+    </div>
+    <div class="card">
+      <div class="card-head"><div class="dots"><div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#ffbd2e"></div><div class="dot" style="background:#28c840"></div></div><span class="card-title">Global Options</span></div>
+      <div class="opt-body">
+        <div class="fl">
+          <label>Global Color (applies to all lines)</label>
+          <select id="gcol" onchange="applyGlobal()" style="width:100%"></select>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--mt);font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em;font-weight:700;margin-bottom:6px">Quick color picker</div>
+          <div class="chips-row" id="chips"></div>
+        </div>
+        <div class="fl">
+          <label>Line prefix</label>
+          <select id="pfx" style="width:100%">
+            <option value="">No prefix</option>
+            <option value="  ">2 spaces</option>
+            <option value="    ">4 spaces</option>
+          </select>
+        </div>
+        <p class="hint">💡 You can customize the color of each individual line in the table below!</p>
+      </div>
+    </div>
+  </div>
+  <div class="card ltw" id="ltw">
+    <div class="card-head"><span class="card-title">Per-Line Color — Customize each line individually</span></div>
+    <div style="overflow-x:auto">
+      <table class="lt"><thead><tr><th>#</th><th>Line Content</th><th>Color</th><th>Bold</th></tr></thead><tbody id="ltb"></tbody></table>
+    </div>
+  </div>
+  <div class="toolbar">
+    <button class="bp" onclick="gen0()">⚡ Generate Script</button>
+    <button class="bs" onclick="loadEx0()">📋 Load Example</button>
+    <button class="br" onclick="clearMode0()">🗑 Clear All</button>
+  </div>
+</div>
+
+<!-- MODE 1 -->
+<div class="section" id="sec1">
+  <div class="card">
+    <div class="card-head"><div class="dots"><div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#ffbd2e"></div><div class="dot" style="background:#28c840"></div></div><span class="card-title">Color Palette — Click a tag to insert at cursor</span></div>
+    <div class="legend" id="legend"></div>
+    <div style="border-top:1px solid var(--bd);padding:9px 13px;background:var(--s2)">
+      <span style="font-size:11px;color:var(--mt);font-family:var(--mono)">
+        How to use: <span style="color:#3fb950">{G}</span>green text<span style="color:#3fb950">{/}</span> &nbsp;•&nbsp;
+        <span style="color:#ffc642">{YB}</span>bold yellow<span style="color:#ffc642">{/}</span> &nbsp;•&nbsp;
+        <span style="color:#87f0a3">{CB}</span>bold cyan<span style="color:#87f0a3">{/}</span> &nbsp;•&nbsp;
+        Select text then click a color to wrap it &nbsp;•&nbsp; {/} = color reset
+      </span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="dots"><div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#ffbd2e"></div><div class="dot" style="background:#28c840"></div></div><span class="card-title">Text with inline color placeholders — {TAG}text{/}</span></div>
+    <textarea id="inp1" rows="11" placeholder="{CB}Commands Table{/}&#10;{G}docker ps{/} — list containers&#10;{YB}git pull{/} — update repository"></textarea>
+  </div>
+  <div class="toolbar">
+    <button class="bp" onclick="gen1()">⚡ Generate Script</button>
+    <button class="bs" onclick="loadEx1()">📋 Load Example</button>
+    <button class="br" onclick="document.getElementById('inp1').value=''">🗑 Clear</button>
+  </div>
+</div>
+
+<!-- OUTPUT -->
+<div class="out-card">
+  <div class="out-head">
+    <div class="tabs">
+      <button class="tab on" id="t0" onclick="setTab(0)">Bash Script</button>
+      <button class="tab" id="t1" onclick="setTab(1)">Terminal Preview</button>
+    </div>
+    <button class="cbtn" id="cbtn" onclick="copyOut()">📋 Copy</button>
+  </div>
+  <div id="outcode" style="color:var(--gn)"># Paste your text above and click Generate Script!</div>
+</div>
+<footer>Made with <b>♥</b> by <b>hohky</b> &nbsp;•&nbsp; MOTD Color Generator v2 &nbsp;•&nbsp; Raspberry Pi &amp; Linux 🍓</footer>
+</div>
+
+<script>
+var COLS=[
+  {c:"0;30",n:"Black",      css:"#6e7681",tag:"K"},
+  {c:"0;31",n:"Red",        css:"#ff7b72",tag:"R"},
+  {c:"0;32",n:"Green",      css:"#3fb950",tag:"G"},
+  {c:"0;33",n:"Yellow",     css:"#e3b341",tag:"Y"},
+  {c:"0;34",n:"Blue",       css:"#79c0ff",tag:"B"},
+  {c:"0;35",n:"Magenta",    css:"#d2a8ff",tag:"M"},
+  {c:"0;36",n:"Cyan",       css:"#56d364",tag:"C"},
+  {c:"0;37",n:"White",      css:"#f0f6fc",tag:"W"},
+  {c:"1;30",n:"Black Bold", css:"#8b949e",tag:"KB"},
+  {c:"1;31",n:"Red Bold",   css:"#ffa198",tag:"RB"},
+  {c:"1;32",n:"Green Bold", css:"#56d364",tag:"GB"},
+  {c:"1;33",n:"Yellow Bold",css:"#ffc642",tag:"YB"},
+  {c:"1;34",n:"Blue Bold",  css:"#a5d6ff",tag:"BB"},
+  {c:"1;35",n:"Mag. Bold",  css:"#efb8ff",tag:"MB"},
+  {c:"1;36",n:"Cyan Bold",  css:"#87f0a3",tag:"CB"},
+  {c:"1;37",n:"White Bold", css:"#ffffff",tag:"WB"}
+];
+var TAG2CODE={};
+COLS.forEach(function(c){TAG2CODE[c.tag]=c.c;});
+
+// Populate select with all 16 colors
+var selHtml=COLS.map(function(c){
+  return '<option value="'+c.c+'">'+c.n+' — \\033['+c.c+'m</option>';
+}).join("");
+document.getElementById("gcol").innerHTML=selHtml;
+document.getElementById("gcol").value="0;32";
+
+// Quick color chips
+(function(){
+  var w=document.getElementById("chips");
+  COLS.forEach(function(col){
+    var d=document.createElement("div");
+    d.className="chip"+(col.c==="0;32"?" on":"");
+    d.style.background=col.css;
+    d.title=col.n+" ("+col.tag+")";
+    d.onclick=function(){
+      document.getElementById("gcol").value=col.c;
+      document.querySelectorAll(".chip").forEach(function(x){x.classList.remove("on");});
+      d.classList.add("on");
+      applyGlobal();
+    };
+    w.appendChild(d);
+  });
+})();
+
+// Inline mode legend
+(function(){
+  var lg=document.getElementById("legend");
+  COLS.forEach(function(col){
+    var d=document.createElement("div");d.className="leg-item";
+    d.innerHTML='<div class="leg-dot" style="background:'+col.css+'"></div>'
+      +'<span class="leg-tag" style="color:'+col.css+'" title="Click to insert at cursor">{'+col.tag+'}</span>'
+      +'<span style="color:var(--mt);font-size:10px">'+col.n+'</span>';
+    d.querySelector(".leg-tag").onclick=function(){insertTag(col.tag);};
+    lg.appendChild(d);
+  });
+  var dr=document.createElement("div");dr.className="leg-item";
+  dr.innerHTML='<div class="leg-dot" style="background:var(--bd)"></div>'
+    +'<span class="leg-tag" style="color:var(--tx)" title="Insert color reset">{/}</span>'
+    +'<span style="color:var(--mt);font-size:10px">Reset Color</span>';
+  dr.querySelector(".leg-tag").onclick=function(){insertTag("/");};
+  lg.appendChild(dr);
+})();
+
+function insertTag(tag){
+  var ta=document.getElementById("inp1");
+  var s=ta.selectionStart,e=ta.selectionEnd,v=ta.value;
+  var sel=v.substring(s,e);
+  var ins;
+  if(tag==="/"){ins="{/}";}
+  else if(sel){ins="{"+tag+"}"+sel+"{/}";}
+  else{ins="{"+tag+"}";}
+  ta.value=v.substring(0,s)+ins+v.substring(e);
+  ta.selectionStart=ta.selectionEnd=s+ins.length;
+  ta.focus();
+}
+
+var curMode=0;
+function setMode(n){
+  curMode=n;
+  [0,1].forEach(function(i){
+    document.getElementById("m"+i).classList.toggle("on",i===n);
+    document.getElementById("sec"+i).classList.toggle("on",i===n);
+  });
+  outs=["",""];
+  var el=document.getElementById("outcode");
+  el.textContent="# Paste your text above and click Generate Script!";
+  el.style.color="var(--gn)";
+}
+
+var lines=[];
+function applyGlobal(){
+  var gc=document.getElementById("gcol").value;
+  lines=lines.map(function(l){return{text:l.text,col:gc};});
+  renderLT();
+  document.querySelectorAll(".chip").forEach(function(ch,i){
+    ch.classList.toggle("on",COLS[i]&&COLS[i].c===gc);
+  });
+}
+function buildLines(){
+  var txt=document.getElementById("inp0").value;
+  var gc=document.getElementById("gcol").value;
+  var parts=txt.split("\n");
+  lines=parts.map(function(line,i){
+    var ex=lines[i];
+    return{text:line,col:ex?ex.col:gc};
+  });
+  renderLT();
+}
+function renderLT(){
+  var w=document.getElementById("ltw"),b=document.getElementById("ltb");
+  if(!lines.length||!lines.some(function(l){return l.text.trim();})){w.style.display="none";return;}
+  w.style.display="block";
+  b.innerHTML=lines.map(function(l,i){
+    var opts=COLS.map(function(c){
+      return'<option value="'+c.c+'"'+(c.c===l.col?' selected':'')+'>'+c.n+'</option>';
+    }).join("");
+    var isbold=l.col.charAt(0)==="1";
+    return'<tr>'
+      +'<td style="color:var(--mt);font-size:10px;user-select:none">'+(i+1)+'</td>'
+      +'<td style="font-family:var(--mono);font-size:11px;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--mt)">'+esc(l.text||'(empty line)')+'</td>'
+      +'<td><select class="lcs" onchange="setLineCol('+i+',this.value)">'+opts+'</select></td>'
+      +'<td style="text-align:center"><input type="checkbox" class="lcb"'+(isbold?' checked':'')+'  onchange="setBold('+i+',this.checked)"></td>'
+      +'</tr>';
+  }).join("");
+}
+function setLineCol(i,v){lines[i].col=v;}
+function setBold(i,v){
+  var c=lines[i].col;
+  if(v&&c.charAt(0)==="0")lines[i].col="1"+c.substring(1);
+  else if(!v&&c.charAt(0)==="1")lines[i].col="0"+c.substring(1);
+  renderLT();
+}
+
+var outs=["",""],curTab=0;
+function setTab(n){
+  curTab=n;
+  [0,1].forEach(function(i){document.getElementById("t"+i).classList.toggle("on",i===n);});
+  renderOutput();
+}
+function renderOutput(){
+  var el=document.getElementById("outcode");
+  if(curTab===1){el.innerHTML=outs[1]||'<span style="color:var(--mt)"># Generate the script first!</span>';}
+  else{el.textContent=outs[0]||"# Paste your text above and click Generate Script!";el.style.color="var(--gn)";}
+}
+
+function gen0(){
+  var txt=document.getElementById("inp0").value;
+  if(!txt.trim()){alert("Please paste some text first!");return;}
+  buildLines();
+  var pfx=document.getElementById("pfx").value;
+  var parts=txt.split("\n");
+  var sc=["#!/bin/bash",""];
+  var ph="";
+  parts.forEach(function(line,i){
+    var l=lines[i]||{col:"0;32"};
+    sc.push('echo -e "'+pfx+'\\033['+l.col+'m'+escBash(line)+'\\033[0m"');
+    var co=COLS.find(function(c){return c.c===l.col;})||COLS[2];
+    ph+='<span style="color:'+co.css+';'+(l.col.charAt(0)==="1"?"font-weight:700;":"")+'">'
+      +pfx+esc(line)+'</span>\n';
+  });
+  outs[0]=sc.join("\n");outs[1]=ph;renderOutput();
+}
+
+function gen1(){
+  var txt=document.getElementById("inp1").value;
+  if(!txt.trim()){alert("Please write some text with placeholders first!");return;}
+  var lns=txt.split("\n");
+  var sc=["#!/bin/bash",""];
+  var ph="";
+  lns.forEach(function(line){
+    var bash='echo -e "'+escBash(line).replace(/\{([A-Z\/]+)\}/g,function(m,tag){
+      if(tag==="/")return"\\033[0m";
+      var code=TAG2CODE[tag];return code?"\\033["+code+"m":m;
+    })+'\\033[0m"';
+    sc.push(bash);
+    var sp=0;
+    var htmlLine=esc(line).replace(/\{([A-Z\/]+)\}/g,function(m,tag){
+      if(tag==="/"){sp--;return'</span>';}
+      var co=COLS.find(function(c){return c.tag===tag;});
+      if(!co)return m;sp++;
+      return'<span style="color:'+co.css+';'+(co.c.charAt(0)==="1"?"font-weight:700;":"")+'">';
+    });
+    while(sp-->0)htmlLine+='</span>';
+    ph+=htmlLine+"\n";
+  });
+  outs[0]=sc.join("\n");outs[1]=ph;renderOutput();
+}
+
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function escBash(s){return s.replace(/\\/g,"\\\\").replace(/"/g,'\\"');}
+
+function copyOut(){
+  var el=document.getElementById("outcode");
+  var txt=curTab===1?el.innerText:el.textContent;
+  var ok=function(){var b=document.getElementById("cbtn");b.textContent="✅ Copied!";setTimeout(function(){b.textContent="📋 Copy";},2200);};
+  if(navigator.clipboard){navigator.clipboard.writeText(txt).then(ok).catch(function(){fb(txt,ok);});}
+  else{fb(txt,ok);}
+}
+function fb(t,ok){
+  var ta=document.createElement("textarea");ta.value=t;ta.style.position="fixed";ta.style.opacity="0";
+  document.body.appendChild(ta);ta.focus();ta.select();
+  try{document.execCommand("copy");ok();}catch(e){}
+  document.body.removeChild(ta);
+}
+
+function clearMode0(){
+  document.getElementById("inp0").value="";lines=[];
+  document.getElementById("ltw").style.display="none";
+  outs=["",""];setTab(0);
+  var el=document.getElementById("outcode");el.textContent="# Paste your text above and click Generate Script!";el.style.color="var(--gn)";
+}
+function loadEx0(){
+  document.getElementById("inp0").value=
+"╔══════════════════════╦══════════════════════════════╗\n║ Command              ║ Description                  ║\n╠══════════════════════╬══════════════════════════════╣\n║ docker ps            ║ List running containers      ║\n║ docker compose up -d ║ Start stack in background    ║\n║ fd <pattern>         ║ Modern find alternative      ║\n║ bat <file>           ║ Cat with syntax highlighting ║\n╚══════════════════════╩══════════════════════════════╝";
+  buildLines();gen0();
+}
+function loadEx1(){
+  document.getElementById("inp1").value=
+"{CB}╔══════════════════════╦══════════════════════════════╗{/}\n{CB}║{/} {YB}Command{/}              {CB}║{/} {YB}Description{/}                  {CB}║{/}\n{CB}╠══════════════════════╬══════════════════════════════╣{/}\n{CB}║{/} {G}docker ps{/}            {CB}║{/} List running containers      {CB}║{/}\n{CB}║{/} {G}docker compose up -d{/} {CB}║{/} Start stack in background    {CB}║{/}\n{CB}║{/} {G}fd{/} <pattern>          {CB}║{/} Modern find alternative      {CB}║{/}\n{CB}║{/} {G}bat{/} <file>            {CB}║{/} Cat with {YB}syntax highlighting{/} {CB}║{/}\n{CB}╚══════════════════════╩══════════════════════════════╝{/}";
+  gen1();
+}
+</script>
+</body>
+</html>
